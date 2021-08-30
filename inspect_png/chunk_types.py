@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from typing import List
+#https://github.com/Hedroed/png-parser/blob/master/pngparser/chunktypes.py
 
 TYPE_IHDR = b'IHDR'
 TYPE_PLTE = b'PLTE'
@@ -23,13 +23,3 @@ TYPE_tEXt = b'tEXt'
 TYPE_tIME = b'tIME'
 TYPE_tRNS = b'tRNS'
 TYPE_zTXt = b'zTXt'
-
-
-def get_all() -> List[bytes]:
-    return [v for k, v in locals().items() if k.startswith('TYPE_')]
-
-def contains(chunk_type: bytes) -> bool:
-    return chunk_type in get_all()
-
-def is_text_chunk(chunk_type: bytes) -> bool:
-    return chunk_type in (TYPE_iTXt, TYPE_tEXt, TYPE_zTXt)

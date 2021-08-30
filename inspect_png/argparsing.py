@@ -53,9 +53,9 @@ def get_parser():
 
     extract_parser = subparsers.add_parser("extract", help="Extract data from PNG chunks")
     extract_parser.add_argument("pngfile", type=str, help="PNG input file")
-    extract_parser.add_argument("-t","--type", help="Filter by type",type=str, nargs="+",action=GenerateFilterAction)
-    extract_parser.add_argument("-i","--index", help="Filter by index",type=str, action=GenerateFilterAction)
-    extract_parser.add_argument("-s","--size", help="Filter by size",type=str, action=GenerateFilterAction)
+    extract_parser.add_argument("-t","--type", help="Filter by type e.g. IHDR, ...",type=str, nargs="+",action=GenerateFilterAction)
+    extract_parser.add_argument("-i","--index", help="Filter by index e.g. gt2, ...",type=str, action=GenerateFilterAction)
+    extract_parser.add_argument("-s","--size", help="Filter by size e.g. lt30, gte40, ...",type=str, action=GenerateFilterAction)
     extract_parser.add_argument("-o","--output-file", help="Output file for chunk data", type=str, default=None, dest="file")
     extract_parser.add_argument("-p","--output-png", help="Output PNG file", type=str, dest="pngout", default=None)
     extract_parser.add_argument("-", help="Output binary data to console", default=False, action="store_true",dest="to_stdout")
