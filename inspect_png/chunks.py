@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import struct
 import zlib
+from yachalk import chalk
 import datetime as dt
 from typing import List
 from .chunk_types import *
@@ -30,15 +31,15 @@ class PNGChunk:
     def present(self, show_crc=False, show_bytes=True, show_length=False, only_raw=False):
         if only_raw:
             return self.data
-        s = f"{self.ctype.decode('ASCII')} ({self.index}):\n"
-        s += f"[{self.file_pos}-{self.file_end}]\n"
+        s = chalk.green(f"{self.ctype.decode('ASCII')} ({self.index}):\n")
+        s += chalk.blue(f"[{self.file_pos}-{self.file_end}]\n")
         if show_length:
-            s+= f"Length: {self.length}\n"
+            s+= f"Length: {chalk.cyan(str(self.length))}\n"
         if show_bytes:
             d_str = (self.data[:19] + b"...") if len(self.data)>20 else self.data
             s += f"Chunk: {d_str}\n"
         if show_crc:
-            s += f"Crc: {self.crc.hex()}\n"
+            s += f"Crc: {chalk.yellow(str(self.crc.hex()))}\n"
         return s
 
 class IHDR_PNGChunk(PNGChunk):
