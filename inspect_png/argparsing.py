@@ -10,18 +10,16 @@ def get_filter_by_type(vals):
     return f
 
 def get_gt_lt_filter_for(prop, cmp_str):
-    if cmp_str[0:2] == "gt":
-        return lambda o: getattr(o, prop) > int(cmp_str[2:])
+    """ Returns function that compares integer prop of chunk """
     if cmp_str[0:3] == "gte":
         return lambda o: getattr(o, prop) >= int(cmp_str[3:])
-    if cmp_str[0:2] == "lt":
-        return lambda o: getattr(o, prop) < int(cmp_str[2:])
-    if cmp_str[0:3] == "lte":
+    elif cmp_str[0:2] == "gt":
+        return lambda o: getattr(o, prop) > int(cmp_str[2:])
+    elif cmp_str[0:3] == "lte":
         return lambda o: getattr(o, prop) <= int(cmp_str[3:])
+    elif cmp_str[0:2] == "lt":
+        return lambda o: getattr(o, prop) < int(cmp_str[2:])
     return lambda o: getattr(o, prop) == int(cmp_str)
-
-def is_txt_chunk(o):
-    return o.ctype in (TYPE_tEXt, TYPE_iTXt, TYPE_eXIf, TYPE_zTXt)
 
 class GenerateFilterAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -54,19 +52,19 @@ def get_parser():
     filter_group.add_argument("--weird", help="Include non-specified chunks", type=str, action=GenerateFilterAction, nargs=0)
     
     # Which info to show
-    present_group = ap.add_argument_group("Chunk info")
+    present_group = ap.add_argument_group("Chunk info display")
     present_group.add_argument("--crc", help="Show chunk crc", default=False, action="store_true", dest="show_crc")
     present_group.add_argument("--length", help="Show chunk length", default=False, action="store_true", dest="show_length")
     present_group.add_argument("--raw", help="Only show chunk bytes", default=False, action="store_true", dest="only_raw")
 
-    # Raw chunk data
+    # Raw chunk bytes to file
     output_group = ap.add_argument_group("Output options")
     output_group.add_argument("-o","--output-file", help="Output file for chunk data", type=str, default=None, dest="file")
     
     # Chunk data with PNG header
     output_group.add_argument("-p","--output-png", help="Output PNG file", type=str, dest="pngout", default=None)
     
-    # Raw chunk data
+    # Raw chunk bytes to stdout
     output_group.add_argument("-", help="Output binary data to console", default=False, action="store_true",dest="to_stdout")
     
     # Fixing

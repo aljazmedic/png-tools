@@ -29,4 +29,9 @@ for k in list(filter(lambda x: x.startswith("TYPE_"), locals())):
     SPECIFIED_TYPES.append(locals()[k])
 
 def is_not_specified(o):
+    """ Checking if chunk is of a specified type """
     return o.ctype not in SPECIFIED_TYPES
+
+def is_txt_chunk(o):
+    """ Checks if o is a text chunk """
+    return o.ctype in (TYPE_tEXt, TYPE_iTXt, TYPE_eXIf, TYPE_zTXt)

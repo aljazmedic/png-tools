@@ -112,9 +112,9 @@ class ztxt_PNGChunk(PNGChunk):
     def present(self,**options):
         s = super().present(**options)
         if self.t_key is None:
-            s+=f"Text (zipped):      (Method:{self.t_method}){self.t_text}"
+            s+=f"Text (zipped {self.t_method}): {self.t_text}"
         else:
-            s+=f"Text (zipped):      (Method:{self.t_method}){self.t_key}={self.t_text}"
+            s+=f"Text (zipped {self.t_method}): {self.t_key}={self.t_text}"
         return s
 
 def chunk_from_file(f):
