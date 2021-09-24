@@ -64,6 +64,15 @@ class IHDR_PNGChunk(PNGChunk):
         s+=f"Interlace method:   {self.interlace_method}\n"
         return s
 
+"""     def get_bytes(self, calc_crc=False, calc_size=False, new_ctype=None, **_):
+        data = struct.pack(">IIBBBBB", self.w, self.h, self.bit_depth, self.color_type, self.compression_method, self.filter_method, self.interlace_method)
+        print(data)
+        crc = self.crc if not calc_crc else self.calc_crc()
+        size = self.length if not calc_size else len(data)
+        ctype = self.ctype if new_ctype is None else str(new_ctype)[:4]
+        fmt = '>I4s%ds4s'%size
+        return struct.pack(fmt, size, ctype, data, crc) """
+
 class tIME_PNGChunk(PNGChunk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

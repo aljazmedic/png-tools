@@ -59,6 +59,10 @@ def get_parser():
     extract_parser.add_argument("-o","--output-file", help="Output file for chunk data", type=str, default=None, dest="file")
     extract_parser.add_argument("-p","--output-png", help="Output PNG file", type=str, dest="pngout", default=None)
     extract_parser.add_argument("-", help="Output binary data to console", default=False, action="store_true",dest="to_stdout")
+    
+    brute_wh_parser = subparsers.add_parser("brute_dim", help="Bruteforces dimensions based on known CRC")
+    brute_wh_parser.add_argument("pngfile", type=str, help="PNG input file")
+    brute_wh_parser.add_argument("pngout", help="Output PNG file", type=str)
     return ap
 
 if __name__ == "__main__":

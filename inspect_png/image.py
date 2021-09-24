@@ -31,6 +31,7 @@ class PNGImage:
             if isinstance(c, IHDR_PNGChunk):
                 self.IHDR = c
                 break
+        assert self.IHDR != None, "Missing IHDR Chunk"
 
     def save_as(self, filename, **options):
         with open(filename, "wb") as wf:
