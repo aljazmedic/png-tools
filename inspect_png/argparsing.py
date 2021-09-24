@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
+from .chunk_types import *
 
 def get_filter_by_type(vals):
     byte_vals = [v.encode("ASCII") for v in vals]
@@ -19,18 +20,25 @@ def get_gt_lt_filter_for(prop, cmp_str):
         return lambda o: getattr(o, prop) <= int(cmp_str[3:])
     return lambda o: getattr(o, prop) == int(cmp_str)
 
+def is_txt_chunk(o):
+    return o.ctype in (TYPE_tEXt, TYPE_iTXt, TYPE_eXIf, TYPE_zTXt)
+
 class GenerateFilterAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         if not 'filters' in namespace:
             setattr(namespace, 'filters', [])
-        previous = namespace.filters
+        current_filters = namespace.filters
         if '--type' in self.option_strings:
-            previous.append(get_filter_by_type(values))
-        if '--index' in self.option_strings:
-            previous.append(get_gt_lt_filter_for('index', values))
-        if '--size' in self.option_strings:
-            previous.append(get_gt_lt_filter_for('length', values))
-        setattr(namespace, 'filters', previous)
+            current_filters.append(get_filter_by_type(values))
+        elif '--index' in self.option_strings:
+            current_filters.append(get_gt_lt_filter_for('index', values))
+        elif '--size' in self.option_strings:
+            current_filters.append(get_gt_lt_filter_for('length', values))
+        elif '--text' in self.option_strings:
+            current_filters.append(is_txt_chunk)
+        elif '--weird' in self.option_strings:
+            current_filters.append(is_not_specified)
+        setattr(namespace, 'filters', current_filters)
 
 def get_parser():
     ap = argparse.ArgumentParser()
@@ -42,6 +50,8 @@ def get_parser():
     filter_group.add_argument("-t","--type", help="Filter by type",type=str, nargs="+",action=GenerateFilterAction)
     filter_group.add_argument("-i","--index", help="Filter by index",type=str, action=GenerateFilterAction)
     filter_group.add_argument("-s","--size", help="Filter by size",type=str, action=GenerateFilterAction)
+    filter_group.add_argument("--text", help="Include only text chunks", type=str, action=GenerateFilterAction, nargs=0)
+    filter_group.add_argument("--weird", help="Include non-specified chunks", type=str, action=GenerateFilterAction, nargs=0)
     
     # Which info to show
     present_group = ap.add_argument_group("Chunk info")

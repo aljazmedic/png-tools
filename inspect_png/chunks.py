@@ -96,9 +96,9 @@ class txt_PNGChunk(PNGChunk):
     def present(self,**options):
         s = super().present(**options)
         if self.t_key is None:
-            s+=f"Text:               {self.t_text}"
+            s+=f"Text: {self.t_text}"
         else:
-            s+=f"Text:               {self.key}={self.t_text}"
+            s+=f"Text: {self.t_key}={self.t_text}"
         return s
 
 class ztxt_PNGChunk(PNGChunk):
@@ -124,8 +124,8 @@ def chunk_from_file(f):
     length = struct.unpack(">I", length_b)[0]
     data = f.read(length)
     crc_r = f.read(4)
-    file_endpos = f.tell()-1
-    constructor_vals = (name,length,data,crc_r,file_startpos,file_endpos,None)
+    file_endpos = f.tell() - 1
+    constructor_vals = (name, length, data, crc_r, file_startpos, file_endpos, None)
 
     classes = {
         TYPE_IHDR:IHDR_PNGChunk,
@@ -133,7 +133,6 @@ def chunk_from_file(f):
         TYPE_tEXt:txt_PNGChunk,
         TYPE_iTXt:txt_PNGChunk,
         TYPE_zTXt:ztxt_PNGChunk
-
     }
     constructor = classes.get(name, PNGChunk)
     return constructor(*constructor_vals)

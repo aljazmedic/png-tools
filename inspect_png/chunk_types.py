@@ -23,3 +23,10 @@ TYPE_tEXt = b'tEXt'
 TYPE_tIME = b'tIME'
 TYPE_tRNS = b'tRNS'
 TYPE_zTXt = b'zTXt'
+
+SPECIFIED_TYPES =  []
+for k in list(filter(lambda x: x.startswith("TYPE_"), locals())):
+    SPECIFIED_TYPES.append(locals()[k])
+
+def is_not_specified(o):
+    return o.ctype not in SPECIFIED_TYPES

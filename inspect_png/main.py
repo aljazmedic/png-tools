@@ -14,9 +14,10 @@ def main():
 
     if parsed.brutedim:
         from .fixing import bruteforce_wh
-        bruteforce_wh(p)
+        print("[INFO]   Beginning bruteforce")
+        did_ok = bruteforce_wh(p)
+        print("[INFO]   Brutreforce "+"[Done]" if did_ok else "[Failed]")
 
-    present_options = {k: getattr(parsed, k, False) for k in ["show_length", "show_crc"]}
     ## Apply the filters
     while len(parsed.filters):
         f = parsed.filters.pop(0)
@@ -36,6 +37,7 @@ def main():
             for c in p.chunks:
                 print(c.data)
         else:
+            present_options = {k: getattr(parsed, k, False) for k in ["show_length", "show_crc"]}
             ## Present chunks
             for c in p.chunks:
                 print(c.present(**present_options))
