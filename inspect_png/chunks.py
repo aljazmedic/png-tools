@@ -21,16 +21,14 @@ class PNGChunk:
     def calc_crc(self):
         return struct.pack(">I", zlib.crc32(self.ctype+self.data))
     
-    def get_bytes(self, calc_crc=False, calc_size=False, new_ctype=None, **_):
+    def encapsulate(self, calc_crc=False, calc_size=False, new_ctype=None, **_):
         crc = self.crc if not calc_crc else self.calc_crc()
         size = self.length if not calc_size else len(self.data)
         ctype = self.ctype if new_ctype is None else str(new_ctype)[:4]
         fmt = '>I4s%ds4s'%size
         return struct.pack(fmt, size, ctype, self.data, crc)
 
-    def present(self, show_crc=False, show_bytes=True, show_length=False, only_raw=False):
-        if only_raw:
-            return self.data
+    def present(self, show_crc=False, show_bytes=True, show_length=False):
         s = chalk.green(f"{self.ctype.decode('ASCII')} ({self.index}):\n")
         s += chalk.blue(f"[{self.file_pos}-{self.file_end}]\n")
         if show_length:
@@ -55,7 +53,6 @@ class IHDR_PNGChunk(PNGChunk):
 
     def present(self,**options):
         s = super().present(**options)
-        if options.get("only_raw", False): return s
         s+=f"Width:              {self.w}\n"
         s+=f"Height:             {self.h}\n"
         s+=f"Bit depth:          {self.bit_depth}\n"
@@ -65,7 +62,7 @@ class IHDR_PNGChunk(PNGChunk):
         s+=f"Interlace method:   {self.interlace_method}\n"
         return s
 
-"""     def get_bytes(self, calc_crc=False, calc_size=False, new_ctype=None, **_):
+"""     def encapsulate(self, calc_crc=False, calc_size=False, new_ctype=None, **_):
         data = struct.pack(">IIBBBBB", self.w, self.h, self.bit_depth, self.color_type, self.compression_method, self.filter_method, self.interlace_method)
         print(data)
         crc = self.crc if not calc_crc else self.calc_crc()
@@ -82,7 +79,6 @@ class tIME_PNGChunk(PNGChunk):
     
     def present(self,**options):
         s = super().present(**options)
-        if options.get("only_raw", False): return s
         s+=f"DateTime:           {self.datetime}"
         return s
 
@@ -99,7 +95,6 @@ class txt_PNGChunk(PNGChunk):
     
     def present(self,**options):
         s = super().present(**options)
-        if options.get("only_raw", False): return s
         if self.t_key is None:
             s+=f"Text:               {self.t_text}"
         else:
@@ -116,7 +111,6 @@ class ztxt_PNGChunk(PNGChunk):
     
     def present(self,**options):
         s = super().present(**options)
-        if options.get("only_raw", False): return s
         if self.t_key is None:
             s+=f"Text (zipped):      (Method:{self.t_method}){self.t_text}"
         else:

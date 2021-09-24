@@ -6,8 +6,11 @@ import time, os, subprocess
 import pickle
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-PICKLE_FILE = os.path.abspath(os.path.join(BASE_DIR,"tmp/cache.pickle"))
-SRC_C = os.path.abspath(os.path.join(BASE_DIR,"cr.c"))
+def relative_file(f):
+    return os.path.abspath(os.path.join(BASE_DIR, f))
+
+PICKLE_FILE = relative_file("tmp/cache.pickle")
+SRC_C = relative_file("cr.c")
 
 def read_cache(f):
     if not os.path.exists(f):
@@ -17,23 +20,22 @@ def read_cache(f):
         with open(f, "rb") as rf:
             return pickle.load(rf)
 
-def write_cache(cache,f):
+def write_cache(cache, f):
     with open(f, "wb") as wf:
         pickle.dump(cache, wf)
 
-def check_cache(ihdr,crc):
+def check_cache(ihdr, crc):
     return read_cache(PICKLE_FILE).get((ihdr, crc), None)
 
-def update_cache(ihdr,crc,w,h):
+def update_cache(ihdr, crc, w, h):
     c = read_cache(PICKLE_FILE)
-    print(c)
-    c[(ihdr,crc)] = (w,h)
-    write_cache(c,PICKLE_FILE)
+    c[(ihdr, crc)] = (w, h)
+    write_cache(c, PICKLE_FILE)
 
 def bruteforce_wh(png:PNGImage):
     ihdr = png.IHDR
     c_formatted_ihdr = ''.join(["\\x%02x"%x for x in (b'IHDR'+ihdr.data)])
-    c_formatted_crc = hex(struct.unpack(">i", ihdr.crc)[0])
+    c_formatted_crc = hex(struct.unpack(">I", ihdr.crc)[0])
     print("IHDR    ", c_formatted_ihdr)
     print("IHDR crc", c_formatted_crc)
     W, H = None, None
@@ -48,7 +50,7 @@ def bruteforce_wh(png:PNGImage):
         c_code = c_code.replace("\\xDE\\xAD\\xBE\\xEF\\xDE\\xAD\\xBE\\xEF\\xDE\\xAD\\xBE\\xEF\\xDE\\xAD\\xBE\\xEF\\xDE", c_formatted_ihdr)
         c_code = c_code.replace("0x69696969", c_formatted_crc)
         try:
-            exec_name = "tmp/cr{}".format(c_formatted_crc)
+            exec_name = relative_file("tmp/cr{}".format(c_formatted_crc))
             tmp_name = exec_name+".c"
             with open(tmp_name, "w") as wf:
                 wf.write(c_code)
@@ -75,13 +77,16 @@ def bruteforce_wh(png:PNGImage):
             except OSError: pass
             try: os.remove(exec_name)
             except OSError: pass
+    
     if W is not None and H is not None:
         print("Found dimensions:", W, "x",H)
         ihdr.w = W
         ihdr.h = H
         ihdr.data = struct.pack(">II", W, H) + ihdr.data[8:]
+        return True
     else:
         print("Cannot find correct dimensions")
+        return False
 
 if __name__=="__main__":
     with open("C:\\tools\\inspect-png\\art.png","rb") as rf:

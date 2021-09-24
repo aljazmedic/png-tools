@@ -35,34 +35,34 @@ class GenerateFilterAction(argparse.Action):
 def get_parser():
     ap = argparse.ArgumentParser()
     ap.set_defaults(filters=[])
-    subparsers = ap.add_subparsers(dest="command", help="Choose what do you want to do with inspect-png",required=True)
-
-    fix_parser = subparsers.add_parser("fix", help="Fixes the PNG by recalculating CRC32-s")
-    fix_parser.add_argument("pngfile", type=str, help="PNG input file")
-    fix_parser.add_argument("pngout", help="Output PNG file", type=str)
-    #fix_parser.add_argument("--remove-text", help="Removes all text chunks", default=False, action="store_true", dest="removetxt")
-
-    chunk_parser = subparsers.add_parser("chunk", help="Analyze PNG chunks")
-    chunk_parser.add_argument("pngfile", type=str, help="PNG input file")
-    chunk_parser.add_argument("-t","--type", help="Filter by type",type=str, nargs="+",action=GenerateFilterAction)
-    chunk_parser.add_argument("-i","--index", help="Filter by index",type=str, action=GenerateFilterAction)
-    chunk_parser.add_argument("-s","--size", help="Filter by size",type=str, action=GenerateFilterAction)
-    chunk_parser.add_argument("--crc", help="Toggle print crc", default=False, action="store_true", dest="show_crc")
-    chunk_parser.add_argument("--length", help="Toggle print length", default=False, action="store_true", dest="show_length")
-    chunk_parser.add_argument("--raw", help="Toggle raw print bytes", default=False, action="store_true", dest="only_raw")
-
-    extract_parser = subparsers.add_parser("extract", help="Extract data from PNG chunks")
-    extract_parser.add_argument("pngfile", type=str, help="PNG input file")
-    extract_parser.add_argument("-t","--type", help="Filter by type e.g. IHDR, ...",type=str, nargs="+",action=GenerateFilterAction)
-    extract_parser.add_argument("-i","--index", help="Filter by index e.g. gt2, ...",type=str, action=GenerateFilterAction)
-    extract_parser.add_argument("-s","--size", help="Filter by size e.g. lt30, gte40, ...",type=str, action=GenerateFilterAction)
-    extract_parser.add_argument("-o","--output-file", help="Output file for chunk data", type=str, default=None, dest="file")
-    extract_parser.add_argument("-p","--output-png", help="Output PNG file", type=str, dest="pngout", default=None)
-    extract_parser.add_argument("-", help="Output binary data to console", default=False, action="store_true",dest="to_stdout")
+    ap.add_argument("pngfile", type=str, help="PNG input file")
     
-    brute_wh_parser = subparsers.add_parser("brute_dim", help="Bruteforces dimensions based on known CRC")
-    brute_wh_parser.add_argument("pngfile", type=str, help="PNG input file")
-    brute_wh_parser.add_argument("pngout", help="Output PNG file", type=str)
+    # Filters
+    filter_group = ap.add_argument_group("Filters")
+    filter_group.add_argument("-t","--type", help="Filter by type",type=str, nargs="+",action=GenerateFilterAction)
+    filter_group.add_argument("-i","--index", help="Filter by index",type=str, action=GenerateFilterAction)
+    filter_group.add_argument("-s","--size", help="Filter by size",type=str, action=GenerateFilterAction)
+    
+    # Which info to show
+    present_group = ap.add_argument_group("Chunk info")
+    present_group.add_argument("--crc", help="Show chunk crc", default=False, action="store_true", dest="show_crc")
+    present_group.add_argument("--length", help="Show chunk length", default=False, action="store_true", dest="show_length")
+    present_group.add_argument("--raw", help="Only show chunk bytes", default=False, action="store_true", dest="only_raw")
+
+    # Raw chunk data
+    output_group = ap.add_argument_group("Output options")
+    output_group.add_argument("-o","--output-file", help="Output file for chunk data", type=str, default=None, dest="file")
+    
+    # Chunk data with PNG header
+    output_group.add_argument("-p","--output-png", help="Output PNG file", type=str, dest="pngout", default=None)
+    
+    # Raw chunk data
+    output_group.add_argument("-", help="Output binary data to console", default=False, action="store_true",dest="to_stdout")
+    
+    # Fixing
+    fix_options = ap.add_argument_group("Fixes")
+    fix_options.add_argument("--brute-dim", help="Bruteforces dimensions based on known CRC", dest="brutedim",action="store_true", default=False)
+    fix_options.add_argument("--recalc", help="Recalculates CRCs of PNG Chunks", dest="recalc",action="store_true", default=False)
     return ap
 
 if __name__ == "__main__":

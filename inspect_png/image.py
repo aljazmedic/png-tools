@@ -37,7 +37,7 @@ class PNGImage:
         with open(filename, "wb") as wf:
             wf.write(self.header)
             for c in self.chunks:
-                b = c.get_bytes(**options)
+                b = c.encapsulate(**options)
                 wf.write(b)
             wf.flush()
 
@@ -45,8 +45,6 @@ class PNGImage:
         return len(self.chunks)
 
     def present(self, **options):
-        if options["only_raw"]:
-            return b"\n".join([c.present(**options) for c in self.chunks])
         chunks_str = '\n'.join([c.present(**options) for c in self.chunks])
         return f"""PNGImage\nHeader: {self.header}\n\nChunks:\n{chunks_str}\n"""
 
