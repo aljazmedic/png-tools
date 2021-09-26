@@ -13,7 +13,7 @@ setup(name='inspect_png',
       packages=find_packages(),
       zip_safe=False,
       entry_points = {
-          'console_scripts': ['inspect_png=inspect_png:main'],
+          'console_scripts': ['inspect_png=inspect_png.main:main'],
       },
       install_requires=install_requires
 )
