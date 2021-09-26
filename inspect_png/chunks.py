@@ -6,13 +6,16 @@ import datetime as dt
 from typing import List
 from .chunk_types import *
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 class PNGChunk:
     def __init__(self, ctype:bytes, length:int, data:bytes, crc:bytes, file_pos:int, file_end:int, index:int):
         self.length = length
         self.ctype = ctype
         self.data = data
         if crc is not None and crc != self.calc_crc():
-            print(f"[WARNING] CRCs of {ctype} differ!")
+            logger.warning(f"Calculated crc of {ctype} does not match")
         self.crc = crc if crc is not None else self.calc_crc()
         self.file_pos = file_pos
         self.file_end=file_end

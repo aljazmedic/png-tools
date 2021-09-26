@@ -1,6 +1,9 @@
 from typing import List
 from .chunks import PNGChunk, IHDR_PNGChunk,tIME_PNGChunk,txt_PNGChunk,ztxt_PNGChunk,chunk_from_file
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 class PNGImage:
     HEADER = bytes(
         [
@@ -31,7 +34,7 @@ class PNGImage:
             if isinstance(c, IHDR_PNGChunk):
                 self.IHDR = c
                 break
-        assert self.IHDR != None, "Missing IHDR Chunk"
+        if self.IHDR is None: logger.warning("Missing IHDR Chunk")
 
     def save_as(self, filename, **options):
         with open(filename, "wb") as wf:
@@ -52,9 +55,9 @@ class PNGImage:
     def from_file(f):
         header = f.read(PNGImage.LEN_HEADEAR)
         if header != PNGImage.HEADER:
-            print("Header missmatch!")
-            print("Expected:", PNGImage.HEADER)
-            print("Got     :", header)
+            logger.warn("Header missmatch!")
+            logger.warn(f"Expected: {PNGImage.HEADER}")
+            logger.warn(f"Got     : {header}")
             raise Exception("Not a valid PNG file!")
         chunks = []
         c = None

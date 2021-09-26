@@ -2,6 +2,8 @@
 
 import argparse
 from .chunk_types import *
+import logging
+logger = logging.getLogger(__name__)
 
 def get_filter_by_type(vals):
     byte_vals = [v.encode("ASCII") for v in vals]
@@ -27,20 +29,25 @@ class GenerateFilterAction(argparse.Action):
             setattr(namespace, 'filters', [])
         current_filters = namespace.filters
         if '--type' in self.option_strings:
+            logger.debug(f"Adding type filter #{len(current_filters) + 1} - Type:{values}")
             current_filters.append(get_filter_by_type(values))
         elif '--index' in self.option_strings:
+            logger.debug(f"Adding type filter #{len(current_filters) + 1} - Index:{values}")
             current_filters.append(get_gt_lt_filter_for('index', values))
         elif '--size' in self.option_strings:
+            logger.debug(f"Adding type filter #{len(current_filters) + 1} - Size:{values}")
             current_filters.append(get_gt_lt_filter_for('length', values))
         elif '--text' in self.option_strings:
+            logger.debug(f"Adding type filter #{len(current_filters) + 1} - Text")
             current_filters.append(is_txt_chunk)
         elif '--weird' in self.option_strings:
+            logger.debug(f"Adding type filter #{len(current_filters) + 1} - Weird")
             current_filters.append(is_not_specified)
         setattr(namespace, 'filters', current_filters)
 
 def get_parser():
     ap = argparse.ArgumentParser()
-    ap.set_defaults(filters=[])
+    ap.set_defaults(filters=[],loglevel=logging.INFO)
     ap.add_argument("pngfile", type=str, help="PNG input file")
     
     # Filters
@@ -71,6 +78,11 @@ def get_parser():
     fix_options = ap.add_argument_group("Fixes")
     fix_options.add_argument("--brute-dim", help="Bruteforces dimensions based on known CRC", dest="brutedim",action="store_true", default=False)
     fix_options.add_argument("--recalc", help="Recalculates CRCs of PNG Chunks", dest="recalc",action="store_true", default=False)
+
+    # Logging
+    log_lvl_group = ap.add_mutually_exclusive_group()
+    log_lvl_group.add_argument("-q", "--quiet", action="store_const", const=logging.WARNING, dest="loglevel")
+    log_lvl_group.add_argument("-v", "--verbose", action="store_const", const=logging.DEBUG, dest="loglevel")
     return ap
 
 if __name__ == "__main__":

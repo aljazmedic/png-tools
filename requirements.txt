@@ -1,4 +1,6 @@
+coloredlogs==15.0.1
+humanfriendly==10.0
 importlib-resources==5.2.2
-inspect-png==0.1
+pyreadline==2.1
 yachalk==0.1.4
 zipp==3.5.0

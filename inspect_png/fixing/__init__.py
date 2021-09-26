@@ -5,6 +5,9 @@ import struct, re
 import time, os, subprocess
 import pickle
 
+from logging import getLogger
+logger = getLogger(__name__)
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 def relative_file(f):
     return os.path.abspath(os.path.join(BASE_DIR, f))
@@ -14,7 +17,7 @@ SRC_C = relative_file("cr.c")
 
 def read_cache(f):
     if not os.path.exists(f):
-        print("Cache doesn't exist")
+        logger.debug("Cache not found")
         return {}
     else:
         with open(f, "rb") as rf:
@@ -33,18 +36,19 @@ def update_cache(ihdr, crc, w, h):
     write_cache(c, PICKLE_FILE)
 
 def bruteforce_wh(png:PNGImage):
+    logger.debug("Beginning bruteforce")
     ihdr = png.IHDR
     c_formatted_ihdr = ''.join(["\\x%02x"%x for x in (b'IHDR'+ihdr.data)])
     c_formatted_crc = hex(struct.unpack(">I", ihdr.crc)[0])
-    print("IHDR    ", c_formatted_ihdr)
-    print("IHDR crc", c_formatted_crc)
+    logger.debug(f"IHDR     {c_formatted_ihdr}")
+    logger.debug(f"IHDR crc {c_formatted_crc}")
     W, H = None, None
     res = check_cache(c_formatted_ihdr, c_formatted_crc)
     if res is not None:
-        print("Loaded from cache")
+        logger.info("Hit in cache")
         W, H = res
     else:
-        print("Running C subprocess:")
+        logger.info("Creating C brute forcer:")
         with open(SRC_C) as rf:
             c_code = rf.read()
         c_code = c_code.replace("\\xDE\\xAD\\xBE\\xEF\\xDE\\xAD\\xBE\\xEF\\xDE\\xAD\\xBE\\xEF\\xDE\\xAD\\xBE\\xEF\\xDE", c_formatted_ihdr)
@@ -69,7 +73,7 @@ def bruteforce_wh(png:PNGImage):
                 else:
                     raise Exception("Cannot find correct dimensions")
         except Exception as e:
-            print(e)
+            logger.exception(e)
         finally:
             try: os.remove(tmp_name)
             except OSError: pass
@@ -79,13 +83,12 @@ def bruteforce_wh(png:PNGImage):
             except OSError: pass
     
     if W is not None and H is not None:
-        print("Found dimensions:", W, "x",H)
+        logger.info(f"Found dimensions: {W} x {H}")
         ihdr.w = W
         ihdr.h = H
         ihdr.data = struct.pack(">II", W, H) + ihdr.data[8:]
         return True
     else:
-        print("Cannot find correct dimensions")
         return False
 
 if __name__=="__main__":
