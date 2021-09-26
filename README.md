@@ -9,7 +9,7 @@ Usage:
 ```
 Usage: inspect_png.py [-h] [-t TYPE [TYPE ...]] [-i INDEX] [-s SIZE] [--text]
                       [--weird] [--crc] [--length] [--raw] [-o FILE]
-                      [-p PNGOUT] [-] [--brute-dim] [--recalc]
+                      [-p PNGOUT] [-] [--brute-dim] [--recalc] [-q | -v]
                       pngfile
 
 positional arguments:
@@ -17,6 +17,8 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
+  -q, --quiet
+  -v, --verbose
 
 Filters:
   -t TYPE [TYPE ...], --type TYPE [TYPE ...]
@@ -41,5 +43,5 @@ Output options:
 
 Fixes:
   --brute-dim           Bruteforces dimensions based on known CRC
-  --recalc              Recalculates CRCs of PNG Chunks`
+  --recalc              Recalculates CRCs of PNG Chunks
 ```
