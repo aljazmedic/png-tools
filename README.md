@@ -1,4 +1,4 @@
-## inspect-png
+## PNG Tools
 ---
 A CTF tool for PNG file inspection
 
